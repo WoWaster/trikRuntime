@@ -60,7 +60,7 @@ CONFIG *= qt
 
 CONFIG -= app_bundle
 
-!win32:CONFIG *= use_gold_linker
+!win32:!contains(QT_ARCH, "riscv64"):CONFIG *= use_gold_linker
 #CONFIG *= fat-lto
 
 #deal with mixed configurations
@@ -137,6 +137,11 @@ use_gold_linker:!clang: QMAKE_LFLAGS += -Wl,--disable-new-dtags
 macx-clang {
 #	QMAKE_MACOSX_DEPLOYMENT_TARGET=10.12
 	QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
+}
+
+contains(QT_ARCH, "riscv64") {
+        warning("No sanitizers on RISC-V, disabling them")
+        CONFIG += nosanitizers
 }
 
 !nosanitizers:!clang:gcc:*-g++*:gcc4{
