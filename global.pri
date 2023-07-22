@@ -139,7 +139,7 @@ macx-clang {
 	QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
-contains(QT_ARCH, "riscv64") {
+!nosanitizers:contains(QT_ARCH, "riscv64") {
         warning("No sanitizers on RISC-V, disabling them")
         CONFIG += nosanitizers
 }
@@ -456,5 +456,9 @@ defineTest(enableFlagIfCan) {
 
 CONFIG(noPch) {
 	noPch()
+}
+
+contains(QT_ARCH, "riscv64") {
+	LIBS += -latomic
 }
 } # GLOBAL_PRI_INCLUDED
