@@ -20,6 +20,9 @@ jobs:
         # gcc-version: ['11']
         arch: ["riscv64"]
         distro: ["debian:sid"]
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
 
     steps:
       # - name: Cancel Previous Workflow Runs
