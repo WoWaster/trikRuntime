@@ -7,18 +7,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  centos:
+  debian:
     runs-on: ubuntu-latest
-    container: riscv64/debian:sid
     defaults:
       run:
         shell: bash -l {0} # to force import of ~/.bash_profile
     strategy:
       matrix:
-        nopython: ['nopython', '']
+        nopython: ['nopython']
         qjsengine: [''] # add 'qjsengine' for CONFIG+=trik_use_qjsengine
         # qt-version: ['5.12']
         # gcc-version: ['11']
+        arch: ['riscv64']
+        distro: ['debian:sid']
 
     steps:
 
@@ -26,6 +27,21 @@ jobs:
         uses: n1hility/cancel-previous-runs@v2.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          platforms: ${{ matrix.arch }}
+
+      - name: Run in Docker
+        run: |
+          docker run \
+            --rm \
+            -v $(pwd):/${{ github.workspace }} \
+            -w ${{ github.workspace }} \
+            --platform linux/${{ matrix.arch }} \
+            ${{ matrix.distro }} \
+            uname -a
 
       - name: Install Debian packages
         run: |
