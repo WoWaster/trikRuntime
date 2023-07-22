@@ -42,6 +42,7 @@ jobs:
             --platform linux/${{ matrix.arch }} \
             ${{ matrix.distro }} \
             uname -a
+            id
 
       - name: Install Debian packages
         run: |
@@ -84,7 +85,7 @@ jobs:
              set -xueo pipefail
              uname -a
              rsync --version
-             ls "$Qt5_Dir/"
+            #  ls "$Qt5_Dir/"
              qmake --version && qmake -query
              python3 --version
              which g++
