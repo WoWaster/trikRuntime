@@ -1,4 +1,4 @@
-name: 'No Python on Debian Sid on RISC-V'
+name: "No Python on Debian Sid on RISC-V"
 on:
   push:
     branches:
@@ -14,24 +14,41 @@ jobs:
         shell: bash -l {0} # to force import of ~/.bash_profile
     strategy:
       matrix:
-        nopython: ['nopython']
-        qjsengine: [''] # add 'qjsengine' for CONFIG+=trik_use_qjsengine
+        # nopython: ["nopython"]
+        # qjsengine: [""] # add 'qjsengine' for CONFIG+=trik_use_qjsengine
         # qt-version: ['5.12']
         # gcc-version: ['11']
-        arch: ['riscv64']
-        distro: ['debian:sid']
+        arch: ["riscv64"]
+        distro: ["debian:sid"]
 
     steps:
-
-      - name: Cancel Previous Workflow Runs
-        uses: n1hility/cancel-previous-runs@v2.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Cancel Previous Workflow Runs
+      #   uses: n1hility/cancel-previous-runs@v2.0
+      #   with:
+      #     token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
           platforms: ${{ matrix.arch }}
+
+      - name: Configure git
+        run: |
+          git --version
+          git config --global core.symlinks true
+          git config --global core.autocrlf false
+
+          #prepare for actions/checkout, otherwise it fails
+          echo "LC_ALL=en_US.utf8" >> $GITHUB_ENV
+          echo "$(dirname $(realpath $(which git)))" >> $GITHUB_PATH
+          echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
+          echo "PERL5LIB=$PERL5LIB" >> $GITHUB_ENV
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: recursive
 
       - name: Run in Docker
         run: |
@@ -41,83 +58,4 @@ jobs:
             -w ${{ github.workspace }} \
             --platform linux/${{ matrix.arch }} \
             ${{ matrix.distro }} \
-            uname -a
-            id
-
-      - name: Install Debian packages
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential qt5-qmake qtbase5-dev qtmultimedia5-dev libqt5svg5-dev qtscript5-dev rsync libusb-1.0-0-dev python3-dev libqt5serialport5-dev libudev-dev libqt5svg5-dev qtwayland5 qtbase5-private-dev qttools5-dev-tools
-
-      - name: Configure git
-        run: |
-            git --version
-            git config --global core.symlinks true
-            git config --global core.autocrlf false
-
-            #prepare for actions/checkout, otherwise it fails
-            echo "LC_ALL=en_US.utf8" >> $GITHUB_ENV
-            echo "$(dirname $(realpath $(which git)))" >> $GITHUB_PATH
-            echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH" >> $GITHUB_ENV
-            echo "PERL5LIB=$PERL5LIB" >> $GITHUB_ENV
-
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
-          submodules: recursive
-
-      # - name: Install Qt
-      #   run: |
-      #       python3 -m pip install -U pip
-      #       python3 -m pip install aqtinstall
-      #       aqt install-qt linux desktop ${{ matrix.qt-version }} -O /Qt \
-      #       --archives qtbase qtmultimedia qtsvg qttools qtserialport qtimageformats icu qtwayland ${{ matrix.qjsengine == 'qjsengine' && 'qtdeclarative' || '-m qtscript' }}
-      #       Qt5_Dir=$(ls -1d /Qt/5*/* | head -n 1)
-      #       echo "Qt5_Dir=${Qt5_Dir}" >> $GITHUB_ENV
-      #       echo "${Qt5_Dir}/bin" >> $GITHUB_PATH
-
-      - name: Use ccache
-        uses: hendrikmuhs/ccache-action@v1.2
-
-      - name: Check available tools
-        run: |
-             set -xueo pipefail
-             uname -a
-             rsync --version
-             #  ls "$Qt5_Dir/"
-             qmake --version && qmake -query
-             python3 --version
-             which g++
-             g++ --version
-             ccache --version
-
-      - name: QMake
-        timeout-minutes: 1
-        run: |
-            qmake CONFIG+=release CONFIG+=${{ matrix.nopython == 'nopython' && 'trik_nopython' || '' }} \
-                  CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=sanitizer \
-                  CONFIG+=sanitize_undefined CONFIG+=${{ matrix.qjsengine == 'qjsengine' && 'trik_use_qjsengine' || '' }} \
-                  "$GITHUB_WORKSPACE/"
-
-      - name: QMake all
-        timeout-minutes: 3
-        run: |
-            make -j $(nproc) qmake_all
-
-      - name: Make all
-        timeout-minutes: 10
-        run: |
-            make -j $(nproc) all
-
-      - name: Unit tests
-        timeout-minutes: 5
-        run: |
-            # export TRIK_PYTHONPATH=$(python3 -c "import sys; import os; print(os.pathsep.join(sys.path))")
-            # export PYTHONVERBOSE=2
-            # export PYTHONDEBUG=2
-            # export PYTHONMALLOC=malloc_debug
-            # export PYTHONFAULTHANDLER=1
-            # export PYTHONDEVMODE=1 #only from 3.7, overrides PYTHONMALLOC and some other
-            # env | sort
-            make -k check TESTARGS="-platform offscreen"
+            scripts/run_in_qemu.sh
