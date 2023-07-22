@@ -3,7 +3,7 @@ set -euxo pipefail
 
 echo "Installing Debian packages"
 apt-get update
-apt-get install --yes --no-install-recommends build-essential qt5-qmake qtbase5-dev qtmultimedia5-dev libqt5svg5-dev qtscript5-dev rsync libusb-1.0-0-dev python3-dev libqt5serialport5-dev libudev-dev libqt5svg5-dev qtwayland5 qtbase5-private-dev qttools5-dev-tools ccache
+apt-get install --yes --no-install-recommends build-essential qt5-qmake qtbase5-dev qtmultimedia5-dev libqt5svg5-dev qtscript5-dev rsync libusb-1.0-0-dev python3-dev libqt5serialport5-dev libudev-dev libqt5svg5-dev qtwayland5 qtbase5-private-dev qttools5-dev-tools
 
 echo "Checking available tools"
 uname -a
@@ -14,7 +14,7 @@ which g++
 g++ --version
 ccache --version
 
-qmakeConfig="CONFIG+=release CONFIG+=trik_nopython CONFIG+=tests CONFIG+=noPch CONFIG+=ccache"
+qmakeConfig="CONFIG+=release CONFIG+=trik_nopython CONFIG+=tests CONFIG+=noPch"
 
 echo "Configuring with QMake"
 qmake $qmakeConfig .
