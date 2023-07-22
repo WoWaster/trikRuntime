@@ -12,7 +12,6 @@ qmake --version && qmake -query
 python3 --version
 which g++
 g++ --version
-ccache --version
 
 qmakeConfig="CONFIG+=release CONFIG+=trik_nopython CONFIG+=tests CONFIG+=noPch"
 
