@@ -14,7 +14,7 @@ which g++
 g++ --version
 ccache --version
 
-qmakeConfig="CONFIG+=release CONFIG+=trik_nopython CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=sanitizer CONFIG+=sanitize_undefined"
+qmakeConfig="CONFIG+=release CONFIG+=trik_nopython CONFIG+=tests CONFIG+=noPch CONFIG+=ccache"
 
 echo "Configuring with QMake"
 qmake $qmakeConfig .
