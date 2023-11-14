@@ -6,6 +6,12 @@ default:
       libqt5svg5-dev qtscript5-dev rsync libusb-1.0-0-dev python3-dev
       libqt5serialport5-dev libudev-dev libqt5svg5-dev qtwayland5
       qtbase5-private-dev qttools5-dev-tools ccache
+    - uname -a
+    - rsync --version
+    - qmake --version && qmake -query
+    - echo $CXX
+    - $CXX --version
+    - ccache --version
 
 build:
   stage: build
