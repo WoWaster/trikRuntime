@@ -9,8 +9,6 @@ default:
     - uname -a
     - rsync --version
     - qmake --version && qmake -query
-    - echo $CXX
-    - $CXX --version
     - ccache --version
 
 build:
