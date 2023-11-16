@@ -448,6 +448,9 @@ defineTest(enableFlagIfCan) {
   }
 }
 
+contains(QT_ARCH, "riscv64") {
+	LIBS += -latomic
+}
 
 CONFIG(noPch) {
 	noPch()
