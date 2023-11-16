@@ -5,32 +5,28 @@ pipeline {
         }
     }
 
-    options {
-        // This is required if you want to clean before build
-        skipDefaultCheckout(true)
-    }
-
     stages {
         stage('Preparation') {
             steps {
-                 // Clean before build
-                cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']])
-                // We need to explicitly checkout from SCM here
-                checkout scm
+                // Clean before build
+                cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']], deleteDirs: true)
             }
         }
         stage('Build') {
             steps {
                 sh 'mkdir build'
-                sh 'cd build'
-                sh 'qmake CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
-                sh 'make -j $(nproc) qmake_all'
-                sh 'make -j $(nproc) all'
+                dir('build') {
+                    sh 'qmake CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
+                    sh 'make -j $(nproc) qmake_all'
+                    sh 'make -j $(nproc) all'
+                }
             }
         }
         stage('Test') {
             steps {
-                sh 'make -k check TESTARGS="-platform offscreen"'
+                dir('build') {
+                    sh 'make -k check TESTARGS="-platform offscreen"'
+                }
             }
         }
     }
