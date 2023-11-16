@@ -61,6 +61,7 @@ CONFIG *= qt
 CONFIG -= app_bundle
 
 !win32:!contains(QT_ARCH, "riscv64"):CONFIG *= use_gold_linker
+contains(QT_ARCH, "riscv64"):CONFIG *= use_lld_linker
 #CONFIG *= fat-lto
 
 #deal with mixed configurations
