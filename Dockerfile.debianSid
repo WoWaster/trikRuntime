@@ -2,3 +2,4 @@ FROM debian:sid-20231030
 
 RUN apt-get update --yes
 RUN apt-get install --yes --no-install-recommends build-essential qt5-qmake qtbase5-dev qtmultimedia5-dev libqt5svg5-dev qtscript5-dev rsync libusb-1.0-0-dev python3-dev libqt5serialport5-dev libudev-dev libqt5svg5-dev qtwayland5 qtbase5-private-dev qttools5-dev-tools ccache
+RUN apt-get install --yes --no-install-recommends clang

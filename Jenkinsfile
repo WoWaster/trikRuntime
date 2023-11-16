@@ -16,7 +16,7 @@ pipeline {
             steps {
                 sh 'mkdir build'
                 dir('build') {
-                    sh 'qmake CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
+                    sh 'qmake -spec linux-clang CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
                     sh 'make -j $(nproc) qmake_all'
                     sh 'make -j $(nproc) all'
                 }
