@@ -14,7 +14,7 @@ pipeline {
         stage('Preparation') {
             steps {
                  // Clean before build
-                cleanWs()
+                cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']])
                 // We need to explicitly checkout from SCM here
                 checkout scm
             }
