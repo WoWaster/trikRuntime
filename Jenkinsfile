@@ -1,6 +1,8 @@
 pipeline {
     agent {
-        docker { image 'debian:sid' }
+        dockerfile {
+            filename 'Dockerfile.debianSid'
+        }
     }
 
     options {
