@@ -3,7 +3,20 @@ pipeline {
         docker { image 'debian:sid' }
     }
 
+    options {
+        // This is required if you want to clean before build
+        skipDefaultCheckout(true)
+    }
+
     stages {
+        stage('Preparation') {
+            steps {
+                 // Clean before build
+                cleanWs()
+                // We need to explicitly checkout from SCM here
+                checkout scm
+            }
+        }
         stage('Build') {
             steps {
                 sh 'mkdir build'
