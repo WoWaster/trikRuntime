@@ -5,11 +5,16 @@ pipeline {
         }
     }
 
+    environment {
+        CCACHE_DIR = '${env.WORKSPACE}/build/ccache'
+    }
+
     stages {
         stage('Preparation') {
             steps {
                 // Clean before build
                 cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']], deleteDirs: true)
+                sh 'ccache -s'
             }
         }
         stage('Build') {
@@ -27,6 +32,11 @@ pipeline {
                 dir('build') {
                     sh 'make -k check TESTARGS="-platform offscreen"'
                 }
+            }
+        }
+        stage('Exiting') {
+            steps {
+                sh 'ccache -s'
             }
         }
     }
