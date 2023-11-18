@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        CCACHE_DIR = '${env.WORKSPACE}/build/ccache'
+        CCACHE_DIR = "${env.WORKSPACE}/build/ccache"
     }
 
     stages {
@@ -14,6 +14,7 @@ pipeline {
             steps {
                 // Clean before build
                 cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']], deleteDirs: true)
+                cache(skipSave: true, caches: [ArbitraryFileCache(path: 'build/ccache', compressionMethod: TAR_ZSTD)])
                 sh 'ccache -s'
             }
         }
@@ -37,6 +38,7 @@ pipeline {
         stage('Exiting') {
             steps {
                 sh 'ccache -s'
+                cache(caches: [ArbitraryFileCache(path: 'build/ccache', compressionMethod: TAR_ZSTD)])
             }
         }
     }
