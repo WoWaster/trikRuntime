@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        CCACHE_DIR = "${env.WORKSPACE}/build/ccache"
+        CCACHE_DIR = "${env.WORKSPACE}/ccache"
     }
 
     stages {
@@ -14,7 +14,6 @@ pipeline {
             steps {
                 // Clean before build
                 cleanWs(patterns: [[pattern: 'build', type: 'INCLUDE']], deleteDirs: true)
-                cache(skipSave: true, caches: [ArbitraryFileCache(path: 'build/ccache', compressionMethod: TAR_ZSTD)])
                 sh 'ccache -s'
             }
         }
@@ -22,7 +21,7 @@ pipeline {
             steps {
                 sh 'mkdir build'
                 dir('build') {
-                    sh 'qmake -spec linux-clang CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
+                    sh 'qmake CONFIG+=release CONFIG+=tests CONFIG+=noPch CONFIG+=ccache CONFIG+=trik_nopython ..'
                     sh 'make -j $(nproc) qmake_all'
                     sh 'make -j $(nproc) all'
                 }
@@ -38,7 +37,6 @@ pipeline {
         stage('Exiting') {
             steps {
                 sh 'ccache -s'
-                cache(caches: [ArbitraryFileCache(path: 'build/ccache', compressionMethod: TAR_ZSTD)])
             }
         }
     }
